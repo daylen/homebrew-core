@@ -14,8 +14,14 @@ class Stockfish < Formula
   end
 
   def install
-    arch = if MacOS.version.requires_popcnt?
-      "x86-64-modern"
+    arch = if Hardware::CPU.type == :arm
+      "apple-silicon"
+    elsif Hardware::CPU.avx2?
+      "x86-64-avx2"
+    elsif Hardware::CPU.sse4_2?
+      "x86-64-sse41-popcnt"
+    elsif Hardware::CPU.ssse3?
+      "x86-64-ssse3"
     else
       "x86-64"
     end
@@ -25,6 +31,6 @@ class Stockfish < Formula
   end
 
   test do
-    system "#{bin}/stockfish", "go", "depth", "20"
+    system "#{bin}/stockfish", "bench"
   end
 end
